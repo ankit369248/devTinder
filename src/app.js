@@ -1,41 +1,34 @@
+require("dotenv").config();
 const express = require("express");
-
+const connectDB = require("./config/database");
 const app = express();
+const User = require("./models/user");
 
-const port = 7777;
+app.use(express.json()); // to parse JSON body
 
-const { adminAuth } = require("./middlewares/auth");
+app.post("/signup", async (req, res) => {
+  const user = new User({
+    firstName: "Sachin",
+    lastName: "Tendulkar",
+    emailId: "sachin@kohli.com",
+    password: "sachin@123",
+  });
 
-/*
-app.use("/admin", adminAuth, (req, res, next) => {
-  next();
-});
-*/
-//Route Handlers
-app.post(
-  "/usr/login",
-  (req, res, next) => {
-    console.log("Into the 1st handler!!");
-    next();
-  },
-  (req, res, next) => {
-    console.log("Into the 2nd handler!!");
-    next();
-  },
-  (req, res) => {
-    console.log("I am third handler");
-    res.send("Welcome to our family!");
+  try {
+    await user.save();
+    res.send("User Added successfully!");
+  } catch (err) {
+    res.status(400).send("Error saving the user:" + err.message);
   }
-);
-
-app.get("/admin/getAllData", adminAuth, (req, res) => {
-  res.send("All Data is received!");
 });
 
-app.get("/admin/deleteAllData", adminAuth, (req, res) => {
-  res.send("All Data is deleted!");
-});
-
-app.listen(port, () => {
-  console.log(`Server is successfully listening on ${port}...`);
-});
+connectDB()
+  .then(() => {
+    console.log("Database connection established...");
+    app.listen(process.env.PORT, () => {
+      console.log("Server listening on port " + process.env.PORT);
+    });
+  })
+  .catch(() => {
+    console.log("Database connection failed!");
+  });
