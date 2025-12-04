@@ -21,6 +21,43 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+// get users API
+app.get("/user", async (req, res) => {
+  const reqBody = req.body;
+  console.log(reqBody);
+  const userEmail = reqBody?.emailId || null;
+  try {
+    if (userEmail) {
+      const users = await User.find({ emailId: userEmail });
+      if (users.length > 0) {
+        res.send(users);
+      } else {
+        res.status(404).send("User not found!");
+      }
+    } else {
+      res.status(404).send("Invalid Input, Please give correct input!");
+    }
+  } catch (err) {
+    console.log("Something went wrong :", err.message);
+    res.send(404).send("Something went wrong :", err.message);
+  }
+});
+
+// feed API
+app.get("/feed", async (req, res) => {
+  try {
+    const users = await User.find({});
+    if (users.length > 0) {
+      res.send(users);
+    } else {
+      res.send("No records found!");
+    }
+  } catch (err) {
+    console.log("Something went wrong :", err.message);
+    res.send(404).send("Something went wrong :", err.message);
+  }
+});
+
 connectDB()
   .then(() => {
     console.log("Database connection established...");
