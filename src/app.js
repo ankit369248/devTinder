@@ -58,6 +58,90 @@ app.get("/feed", async (req, res) => {
   }
 });
 
+// Get specific user data
+app.get("/userOne", async (req, res) => {
+  try {
+    //console.log(`request : ${req?.body}`);
+    console.log(req.query);
+    const { emailId } = req.query;
+    if (!emailId) {
+      console.log("Invalid Input!");
+      return res.status(400).send("Invalid Input!");
+    }
+    const user = await User.findOne({ emailId });
+    console.log(user);
+    return res.send(user);
+  } catch (err) {
+    console.log("Something went wrong :", err.message);
+    res.status(500).send("Something went wrong!");
+  }
+});
+
+// API to delete a user
+app.delete("/user", async (req, res) => {
+  try {
+    if (!req?.body?.emailId) {
+      return res.status(400).send("Please provide required input emailId");
+    }
+    const { emailId } = req?.body;
+    console.log(emailId);
+    const deletedUser = await User.findOneAndDelete({ emailId });
+    if (!deletedUser) {
+      console.log(`User not found!`);
+      return res.send("User not found!");
+    }
+    console.log(`User with ${emailId} is deleted successfully!`);
+    res.send("User deleted successfully!");
+  } catch (err) {
+    console.log("Something went wrong :", err.message);
+    res.status(404).send("Something went wrong!");
+  }
+});
+
+// API to update the user data with any unique entity
+app.patch("/user", async (req, res) => {
+  try {
+    console.log(req?.body);
+    if (!req.body.emailId) {
+      return res.status(400).send("Please provide required input emailId");
+    }
+
+    const emailId = req.body.emailId;
+
+    const updatedUser = await User.findOneAndUpdate({ emailId }, req.body);
+
+    if (!updatedUser) {
+      return res.status(404).send("User not found!");
+    }
+
+    return res.send("User updated successfully!");
+  } catch (err) {
+    console.log("Error:", err.message);
+    return res.status(500).send("Something went wrong");
+  }
+});
+
+/*
+// API to update user data with id
+app.patch("/user", async (req, res) => {
+  try {
+    console.log(req?.body);
+    if (!req?.body?.userId) {
+      return res.status(404).send("Please provide required userId inputs!");
+    }
+    const reqBody = req?.body;
+    const userId = req?.body?.userId;
+    const updatedUser = await User.findByIdAndUpdate({ _id: userId }, reqBody);
+    if (!updatedUser) {
+      return res.status(404).send("User not found!");
+    }
+    res.send("User updated successfully!");
+  } catch (err) {
+    console.log("Error:", err.message);
+    return res.status(500).send("Something went wrong");
+  }
+});
+*/
 connectDB()
   .then(() => {
     console.log("Database connection established...");
