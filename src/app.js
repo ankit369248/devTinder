@@ -48,13 +48,13 @@ app.get("/feed", async (req, res) => {
   try {
     const users = await User.find({});
     if (users.length > 0) {
-      res.send(users);
+      return res.send(users);
     } else {
-      res.send("No records found!");
+      return res.status(404).send("No records found!");
     }
   } catch (err) {
     console.log("Something went wrong :", err.message);
-    res.send(404).send("Something went wrong :", err.message);
+    return res.status(404).send("Something went wrong :" + err.message);
   }
 });
 
@@ -69,8 +69,13 @@ app.get("/userOne", async (req, res) => {
       return res.status(400).send("Invalid Input!");
     }
     const user = await User.findOne({ emailId });
-    console.log(user);
-    return res.send(user);
+    if (!user) {
+      console.log("User Not found!");
+      return res.status(404).send("User Not found!");
+    } else {
+      console.log(user);
+      return res.send(user);
+    }
   } catch (err) {
     console.log("Something went wrong :", err.message);
     res.status(500).send("Something went wrong!");
@@ -88,13 +93,13 @@ app.delete("/user", async (req, res) => {
     const deletedUser = await User.findOneAndDelete({ emailId });
     if (!deletedUser) {
       console.log(`User not found!`);
-      return res.send("User not found!");
+      return res.status(404).send("User not found!");
     }
     console.log(`User with ${emailId} is deleted successfully!`);
     res.send("User deleted successfully!");
   } catch (err) {
     console.log("Something went wrong :", err.message);
-    res.status(404).send("Something went wrong!");
+    res.status(500).send("Something went wrong!");
   }
 });
 
@@ -108,7 +113,9 @@ app.patch("/user", async (req, res) => {
 
     const emailId = req.body.emailId;
 
-    const updatedUser = await User.findOneAndUpdate({ emailId }, req.body);
+    const updatedUser = await User.findOneAndUpdate({ emailId }, req.body, {
+      runValidators: true,
+    });
 
     if (!updatedUser) {
       return res.status(404).send("User not found!");
@@ -117,7 +124,9 @@ app.patch("/user", async (req, res) => {
     return res.send("User updated successfully!");
   } catch (err) {
     console.log("Error:", err.message);
-    return res.status(500).send("Something went wrong");
+    return res
+      .status(500)
+      .send("Not able to Update user details: " + err.message);
   }
 });
 
