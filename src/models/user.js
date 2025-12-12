@@ -12,6 +12,8 @@ const userSchema = new mongoose.Schema(
     },
     lastName: {
       type: String,
+      minLength: 3,
+      maxLength: 25,
       match: /^[A-Za-z]+$/,
     },
     emailId: {
@@ -20,14 +22,15 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
       unique: true,
+      maxLength: 25,
       match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
     },
     password: {
       type: String,
       required: true,
       trim: true,
-      min: 8,
-      max: 20,
+      minLength: 8,
+      maxLength: 20,
     },
     age: {
       type: Number,
@@ -42,13 +45,20 @@ const userSchema = new mongoose.Schema(
     },
     photoURL: {
       type: String,
+      maxLength: 255,
     },
     about: {
       type: String,
+      maxLength: 255,
       default: "This is default about section!",
     },
     skills: {
       type: [String],
+      validate(value) {
+        if (value.length > 10) {
+          throw new Error("Skills cannot be more than 10");
+        }
+      },
     },
   },
   { timestamps: true }

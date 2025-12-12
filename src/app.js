@@ -39,7 +39,7 @@ app.get("/user", async (req, res) => {
     }
   } catch (err) {
     console.log("Something went wrong :", err.message);
-    res.send(404).send("Something went wrong :", err.message);
+    res.status(404).send("Something went wrong :", err.message);
   }
 });
 
@@ -59,11 +59,10 @@ app.get("/feed", async (req, res) => {
 });
 
 // Get specific user data
-app.get("/userOne", async (req, res) => {
+app.get("/userOne/:emailId", async (req, res) => {
   try {
-    //console.log(`request : ${req?.body}`);
-    console.log(req.query);
-    const { emailId } = req.query;
+    console.log(req?.params.emailId);
+    const emailId = req?.params.emailId;
     if (!emailId) {
       console.log("Invalid Input!");
       return res.status(400).send("Invalid Input!");
@@ -104,6 +103,7 @@ app.delete("/user", async (req, res) => {
 });
 
 // API to update the user data with any unique entity
+/*
 app.patch("/user", async (req, res) => {
   try {
     console.log(req?.body);
@@ -129,28 +129,53 @@ app.patch("/user", async (req, res) => {
       .send("Not able to Update user details: " + err.message);
   }
 });
+*/
 
-/*
 // API to update user data with id
-app.patch("/user", async (req, res) => {
+app.patch("/user/:userId", async (req, res) => {
   try {
-    console.log(req?.body);
-    if (!req?.body?.userId) {
+    const reqBody = req?.body;
+    console.log(`reqBody : ${reqBody}`);
+    const UPDATE_ALLOWED = [
+      "firstName",
+      "lastName",
+      "password",
+      "skills",
+      "photoURL",
+      "about",
+      "age",
+    ];
+    const isUpdateAllowed = Object.keys(reqBody).every((key) =>
+      UPDATE_ALLOWED.includes(key)
+    );
+    console.log(`Is_UPDATE_ALLOWED : ${isUpdateAllowed}`);
+
+    const userId = req?.params.userId;
+    console.log(userId);
+    if (!userId) {
       return res.status(404).send("Please provide required userId inputs!");
     }
-    const reqBody = req?.body;
-    const userId = req?.body?.userId;
-    const updatedUser = await User.findByIdAndUpdate({ _id: userId }, reqBody);
+    if (!isUpdateAllowed) {
+      throw new Error("Update Not allowed");
+    }
+    if (reqBody?.skills) {
+      if (reqBody?.skills.length > 10)
+        throw new Error("More than 10 skills input is not allowed");
+    }
+    const updatedUser = await User.findByIdAndUpdate(userId, reqBody, {
+      new: true,
+      runValidators: true,
+    });
     if (!updatedUser) {
       return res.status(404).send("User not found!");
     }
     res.send("User updated successfully!");
   } catch (err) {
     console.log("Error:", err.message);
-    return res.status(500).send("Something went wrong");
+    return res.status(500).send("UPDATE FAILED : " + err.message);
   }
 });
-*/
+
 connectDB()
   .then(() => {
     console.log("Database connection established...");
