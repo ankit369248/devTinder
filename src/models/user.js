@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 //created userSchema from mongoose library
 const userSchema = new mongoose.Schema(
@@ -22,8 +23,11 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
       unique: true,
-      maxLength: 25,
-      match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("EmailId Format is Invalid");
+        }
+      },
     },
     password: {
       type: String,
@@ -31,6 +35,11 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minLength: 8,
       maxLength: 20,
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("Password is not strong");
+        }
+      },
     },
     age: {
       type: Number,
@@ -46,6 +55,11 @@ const userSchema = new mongoose.Schema(
     photoURL: {
       type: String,
       maxLength: 255,
+      validate(value) {
+        if (value && !validator.isURL(value)) {
+          throw new Error("URL is not valid!");
+        }
+      },
     },
     about: {
       type: String,
