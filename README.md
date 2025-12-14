@@ -18,20 +18,22 @@ This project is part of my learning journey toward mastering backend development
 - Strong password validation
 - URL validation for profile images
 - Secure update system with allowed-fields rules
+- using bcrypt hashed password is stored in db
 
 ---
 
 ## 🛠 Tech Stack
 
-| Technology     | Purpose                              |
-| -------------- | ------------------------------------ |
-| **Node.js**    | JavaScript runtime                   |
-| **Express.js** | Web framework for APIs               |
-| **MongoDB**    | NoSQL database                       |
-| **Mongoose**   | ODM for MongoDB                      |
-| **dotenv**     | Environment configuration            |
-| **nodemon**    | Auto-restart in development          |
-| **validator**  | For email, password & URL validation |
+| Technology     | Purpose                                |
+| -------------- | -------------------------------------- |
+| **Node.js**    | JavaScript runtime                     |
+| **Express.js** | Web framework for APIs                 |
+| **MongoDB**    | NoSQL database                         |
+| **Mongoose**   | ODM for MongoDB                        |
+| **dotenv**     | Environment configuration              |
+| **nodemon**    | Auto-restart in development            |
+| **validator**  | For email, password & URL validation   |
+| **bcrypt**     | For password enctyption and decryption |
 
 ---
 
@@ -47,6 +49,8 @@ devTinder/
 │ │ └── auth.js
 │ ├── models/
 │ │ └── user.js
+│ ├── utils/
+│ │ └── validation.js
 │ └── app.js
 │
 ├── .env
@@ -91,6 +95,7 @@ http://localhost:7777
 ## 📡 API Endpoints
 
 🔹 POST /signup — Create a new user  
+🔹 POST /login — Existing user login  
 🔹 GET /user — Get user by email from request body  
 🔹 GET /userOne/:emailId — Get user using emailId from route param
 🔹 GET /feed — Get all users  
@@ -109,6 +114,7 @@ http://localhost:7777
 - Skills → max 10 items
 - Auto-trimmed + lowercase email
 - Timestamps cleaned & formatted
+- Password → with bcrypt allwing valid user login only
 
 ---
 
