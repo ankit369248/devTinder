@@ -12,6 +12,26 @@ const reqBodyValidation = ({ firstName, lastName, emailId, password }) => {
   }
 };
 
+const validateEditProfileData = (data) => {
+  const fieldUpdateAllowed = [
+    "firstName",
+    "lastName",
+    "gender",
+    "skills",
+    "about",
+    "photoURL",
+  ];
+
+  const isEditAllowed = Object.keys(data).every((field) =>
+    fieldUpdateAllowed.includes(field)
+  );
+
+  console.log(`isEditAllowed : ${isEditAllowed}`);
+
+  return isEditAllowed;
+};
+
 module.exports = {
   reqBodyValidation,
+  validateEditProfileData,
 };
